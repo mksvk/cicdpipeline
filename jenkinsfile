@@ -1,70 +1,19 @@
 pipeline {
     agent {
-<<<<<<< HEAD
-        kubernetes {
-            yamlFile 'demo.yaml'
-            idleMinutes 1
-        }
+        label 'master' // Use your desired agent label here
     }
-    
-    environment {
-        DOCKER_USERNAME = 'mksvk'
-        DOCKER_PASSWORD = 'Mksvk4959@'
-    }
-      
+
     stages {
-        stage('Build Docker Image') {
+        stage('Checkout') {
             steps {
-                script {
-                    sh 'docker build -t mksvk/cicd  .'
-                }
+                checkout scm
             }
         }
-        
-        stage('Push Docker Image') {
+
+        stage('Install Helm Chart') {
             steps {
-                script {
-                    sh "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
-                    sh 'docker push mksvk/cicd'
-                }
+                sh 'helm install mk ./mychart/'
             }
-        }
-        
-        stage('Creating Kubernetes Deployment') {
-            steps {
-                script {
-                    sh 'kubectl apply -f cicd.yaml'
-                    sh 'kubectl get pods'
-                }
-            }
-=======
-        node('kk') // Specify the label for the static agent
-    }
-    
-    stages {
-        stage('Build') {
-            steps {
-                sh 'echo "Building..."'
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                sh 'echo "Testing..."'
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                sh 'echo "Deploying..."'
-            }
-        }
-    }
-    
-    post {
-        always {
-            cleanWs() // Clean up the workspace after the pipeline
->>>>>>> 244e70a2f64d8f35bb99dc08033ec1f974abae38
         }
     }
 }
