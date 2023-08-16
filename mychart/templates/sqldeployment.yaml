@@ -1,0 +1,305 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbconfig
+data:
+  MYSQL_ROOT_PASSWORD: mksvk
+  MYSQL_DATABASE: tms
+  MYSQL_USER: tms_user
+  MYSQL_PASSWORD: tms_password
+
+---
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mksvk/db:7.0
+        envFrom:
+        - configMapRef:
+            name: dbconfig
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: nginx-pvca
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: nginx-pvca
+        persistentVolumeClaim:
+          claimName: nginx-pvca
+  volumeClaimTemplates:
+  - metadata:
+      name: nginx-pvca
+    spec:
+      accessModes: ["ReadWriteMany"]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 1Gi
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  clusterIP: None
+  selector:
+    app: mysql
+  ports:
+    - name: mysql
+      port: 3306
+
+
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: dbconfig
+# data:
+#   MYSQL_ROOT_PASSWORD: {{ .Values.dbconfig.MYSQL_ROOT_PASSWORD }}
+#   MYSQL_DATABASE: {{ .Values.dbconfig.MYSQL_DATABASE }}
+#   MYSQL_USER: {{ .Values.dbconfig.MYSQL_USER }}
+#   MYSQL_PASSWORD: {{ .Values.dbconfig.MYSQL_PASSWORD }}
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: mysql-pv
+# spec:
+#   capacity:
+#     storage: {{ .Values.persistentVolume.capacity }}
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   hostPath:
+#     path: /mnt/data/mysql
+#   storageClassName: {{ .Values.persistentVolume.storageClassName }}
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: mysql1
+# spec:
+#   selector:
+#     matchLabels:
+#       app: mysql
+#   serviceName: {{ .Values.stateful.serviceName }}
+#   replicas: {{ .Values.stateful.replicas }}
+#   template:
+#     metadata:
+#       labels:
+#         app: mysql
+#     spec:
+#       containers:
+#       - name: mysql
+#         image: mksvk/db:1.0
+#         envFrom:
+#         - configMapRef:
+#             name: dbconfig
+#         ports:
+#         - containerPort: {{ .Values.stateful.containerPort }}
+#           name: mysql
+#         volumeMounts:
+#         - name: mysql-persistent-storage
+#           mountPath: {{ .Values.stateful.mountPath }}
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: mysql-persistent-storage
+#     spec:
+#       accessModes: [ "ReadWriteMany" ]
+#       resources:
+#         requests:
+#           storage: {{ .Values.persistentVolume.capacity }}
+#       storageClassName: {{ .Values.persistentVolume.storageClassName }}
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: {{ .Values.stateful.service.name }}
+# spec:
+#   clusterIP: None
+#   selector:
+#     app: mysql
+#   ports:
+#     - name: mysql
+#       port: {{ .Values.stateful.service.port }}
+
+
+
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: dbconfig
+# data:
+#   MYSQL_ROOT_PASSWORD: mksvk
+#   MYSQL_DATABASE: tms
+#   MYSQL_USER: tms_user
+#   MYSQL_PASSWORD: tms_password
+
+# ---
+
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: mysql-pv
+# spec:
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   hostPath:
+#     path: /mnt/data/mysql
+#   storageClassName: standard
+# ---
+
+
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: mysql
+# spec:
+#   selector:
+#     matchLabels:
+#       app: mysql
+#   serviceName: mysql
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: mysql
+#     spec:
+#       containers:
+#       - name: mysql
+#         image: mksvk/db:1.0
+#         envFrom:
+#         - configMapRef:
+#             name: dbconfig
+#         ports:
+#         - containerPort: 3306
+#           name: mysql
+#         volumeMounts:
+#         - name: mysql-persistent-storage
+#           mountPath: /var/lib/mysql
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: mysql-persistent-storage
+#     spec:
+#       accessModes: [ "ReadWriteOnce" ]
+#       resources:
+#         requests:
+#           storage: 1Gi
+#       storageClassName: standard
+
+# ---
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mysql-service
+# spec:
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: dbconfig
+# data:
+#   MYSQL_ROOT_PASSWORD: mksvk
+#   MYSQL_DATABASE: tms
+#   MYSQL_USER: tms_user
+#   MYSQL_PASSWORD: tms_password
+
+# ---
+
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: mysql-pv
+# spec:
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   hostPath:
+#     path: /mnt/data/mysql
+#   storageClassName: standard
+# ---
+
+
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: mysql
+# spec:
+#   selector:
+#     matchLabels:
+#       app: mysql
+#   serviceName: mysql
+#   replicas: 1
+#   template:
+#     metadata:
+#       labels:
+#         app: mysql
+#     spec:
+#       containers:
+#       - name: mysql
+#         image: mksvk/db:1.0
+#         envFrom:
+#         - configMapRef:
+#             name: dbconfig
+#         ports:
+#         - containerPort: 3306
+#           name: mysql
+#         volumeMounts:
+#         - name: mysql-persistent-storage
+#           mountPath: /var/lib/mysql
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: mysql-persistent-storage
+#     spec:
+#       accessModes: [ "ReadWriteOnce" ]
+#       resources:
+#         requests:
+#           storage: 1Gi
+#       storageClassName: standard
+
+# ---
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mysql-service
+# spec:
+#   clusterIP: None
+#   selector:
+#     app: mysql
+#   ports:
+#     - name: mysql
+#       port: 3306
+#   clusterIP: None
+#   selector:
+#     app: mysql
+#   ports:
+#     - name: mysql
+#       port: 3306
