@@ -1,47 +1,80 @@
-pipeline {
+
+pipeline { 
+
+    environment { 
+
+        registry = "mksvk/jenkins-demo" 
+
+        registryCredential = 'docker-hub-credentials' 
+
+        dockerImage = '' 
+
+    }
+
     agent {
+
         label "kk"
+
     }
 
-    environment {
-        DOCKER_REPO = "mksvk/pipeline"
-    }
+    stages { 
 
-    stages {
-        stage('Checkout') {
+         stage('Checkout') {
             steps {
                 // Checkout the Git repository
                 checkout scm
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                // Build the Docker image from the Dockerfile in the repository
-                script {
-                    def dockerImage = docker.build("${DOCKER_REPO}:${env.BUILD_NUMBER}")
+
+        stage('Building our image') { 
+
+            steps { 
+
+                script { 
+
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+
                 }
-            }
+
+            } 
+
         }
 
-        stage('Push to Docker Hub') {
-            steps {
-                // Push the Docker image to Docker Hub
-                script {
-                    docker.withRegistry('', 'docker-hub-credentials') {
-                        dockerImage.push()
+        stage('Deploying image') { 
+
+            steps { 
+
+                script { 
+
+                    docker.withRegistry( '', registryCredential ) { 
+
+                        dockerImage.push() 
+
                     }
-                }
+
+                } 
+
             }
+
         }
+
+ 
+
         stage('Running Container') {
+
           steps {
+
             script {
+
               sh "docker run -d -p 3002:80 ${registry}" + ":$BUILD_NUMBER" 
-            }
-            }
-        }
-     
-        }
+
+    }
+
 }
 
+        }
+
+    }
+
+}
