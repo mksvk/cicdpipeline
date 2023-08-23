@@ -1,5 +1,7 @@
 pipeline {
-    agent kk
+    agent {
+        label "kk"
+    }
 
     environment {
         DOCKER_REPO = "mksvk/pipeline"
